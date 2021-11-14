@@ -56,14 +56,15 @@ bool Is_correct(int X, int Y, problem p) {
     }
 }
 
-int main()
-{
+void set_game() {
+    setGameOption(GameOption::GAME_OPTION_INVENTORY_BUTTON, false);
+    setGameOption(GameOption::GAME_OPTION_MESSAGE_BOX_BUTTON, false);
     bool tf[2] = { true,false };
     //문제 21개 생성
     ObjectPtr num;
     ObjectPtr word;
     srand(time(0));
-    auto scene=Scene::create("", "Images/배경1.png");
+    auto scene = Scene::create("", "Images/배경1.png");
     problem prob[21];
     char path[70];
     for (int i = 0;i < 21;i++) {
@@ -74,21 +75,21 @@ int main()
         n1 = rand() % 14;
         n2 = rand() % 5;
         if (bool1) {
-            sprintf(path, "Images/숫자%d.png", n2+5);
-            num = Object::create(path, scene,0,0);
+            sprintf(path, "Images/숫자%d.png", n2 + 5);
+            num = Object::create(path, scene, 0, 0);
         }
         else {
-            sprintf(path, "Images/숫자%d.png", n2 );
-            num = Object::create(path, scene,0,0);
+            sprintf(path, "Images/숫자%d.png", n2);
+            num = Object::create(path, scene, 0, 0);
         }
 
         if (bool2) {
-            sprintf(path, "Images/글자%d.png",n1 + 14);
-            word = Object::create(path, scene,0,0);
+            sprintf(path, "Images/글자%d.png", n1 + 14);
+            word = Object::create(path, scene, 0, 0);
         }
         else {
-            sprintf(path, "Images/글자%d.png",n1);
-            word = Object::create(path, scene,0,0);
+            sprintf(path, "Images/글자%d.png", n1);
+            word = Object::create(path, scene, 0, 0);
         }
         num->setScale(0.8f);
         word->setScale(0.8f);
@@ -101,70 +102,66 @@ int main()
 
     int correct = 0, wrong = 0;
     int X, Y;
-    int n, m,i=0;
+    int n, m, i = 0;
     n = rand() % 2;
     m = rand() % 2;
     X = x[n];Y = y[m];
     prob[0].show();
-    prob[0].locate(scene, X, Y);
-
-    right_button->setOnMouseCallback([&](ObjectPtr object, int x1, int y1, MouseAction action)->bool{
-        if (i < 20) {
-            if (Is_correct(X, Y, prob[i])) {
-                correct++;
-                printf("%d : 0\n",i+1);
+    prob[0].locate(scene, X, Y);    
+    int count = 0;
+    scene->setOnKeyboardCallback([&](ScenePtr scene, KeyCode key, bool pressed)->bool {
+        if (count % 2)
+        {
+            if (key == KeyCode::KEY_LEFT_ARROW) {
+                if (Is_correct(X, Y, prob[i])) {
+                    correct++;
+                    printf("%d : 0\n", i + 1);
+                }
+                else {
+                    wrong++;
+                    printf("%d : X\n", i + 1);
+                }
+                prob[i].hide();
+                i++;
+                n = rand() % 2;
+                m = rand() % 2;
+                X = x[n];
+                Y = y[m];
+                prob[i].show();
+                prob[i].locate(scene, X, Y);
             }
-            else {
-                wrong++;
-                printf("%d : 1\n",i+1);
-            }
-            prob[i].hide();
-            i++;
-            n = rand() % 2;
-            m = rand() % 2;
-            X = x[n];
-            Y = y[m];
-            prob[i].show();
-            prob[i].locate(scene, X, Y);
-            if (i == 20) {
-                sprintf(path, "정답 : %d, 오답 : %d", correct, wrong);
-                printf("correct : %d, wrong : %d\n", correct, wrong);
-                showMessage(path);
-            }
-        }
-        return true;
-        });
-
-    wrong_button->setOnMouseCallback([&](ObjectPtr object, int x1, int y1, MouseAction action)->bool {
-        if (i < 20) {
-            if (Is_correct(X, Y, prob[i])) {
-                wrong++;
-                printf("%d : 1\n",i+1);
-            }
-            else {
-                correct++;
-                printf("%d : 0\n",i+1);
-            }
-            prob[i].hide();
-            i++;
-            n = rand() % 2;
-            m = rand() % 2;
-            X = x[n];
-            Y = y[m];
-            prob[i].show();
-            prob[i].locate(scene, X, Y);
-            if (i == 20) {
-                sprintf(path, "정답 : %d, 오답 : %d", correct, wrong);
-                printf("correct : %d, wrong : %d\n", correct, wrong);
-                showMessage(path);
+            else if (key == KeyCode::KEY_RIGHT_ARROW) {
+                if (Is_correct(X, Y, prob[i])) {
+                    wrong++;
+                    printf("%d : X\n", i + 1);
+                }
+                else {
+                    correct++;
+                    printf("%d : 0\n", i + 1);
+                }
+                prob[i].hide();
+                i++;
+                n = rand() % 2;
+                m = rand() % 2;
+                X = x[n];
+                Y = y[m];
+                prob[i].show();
+                prob[i].locate(scene, X, Y);
             }
         }
-        else
-            return true;
+        if (i == 20) {
+            sprintf(path, "정답 : %d, 오답 : %d", correct, wrong);
+            printf("correct : %d, wrong : %d\n", correct, wrong);
+            showMessage(path);
+        }
+        count++;
         return true;
         });
-
-    setGameOption(GameOption::GAME_OPTION_INVENTORY_BUTTON, false);
-    setGameOption(GameOption::GAME_OPTION_MESSAGE_BOX_BUTTON, false);
     startGame(scene);
+}
+
+int main()
+{
+    set_game();
+    return 0;
 }
