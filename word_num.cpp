@@ -110,7 +110,7 @@ void set_game() {
     prob[0].locate(scene, X, Y);    
     int count = 0;
     scene->setOnKeyboardCallback([&](ScenePtr scene, KeyCode key, bool pressed)->bool {
-        if (count % 2)
+        if ((count % 2)&&(i<20))
         {
             if (key == KeyCode::KEY_LEFT_ARROW) {
                 if (Is_correct(X, Y, prob[i])) {
@@ -152,6 +152,7 @@ void set_game() {
         if (i == 20) {
             sprintf(path, "정답 : %d, 오답 : %d", correct, wrong);
             printf("correct : %d, wrong : %d\n", correct, wrong);
+            i++;
             showMessage(path);
         }
         count++;
